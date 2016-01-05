@@ -1342,6 +1342,18 @@ OBJS += $(DBUS_OBJS)
 L_CFLAGS += $(DBUS_CFLAGS)
 LIBS += $(DBUS_LIBS)
 
+ifdef CONFIG_CTRL_IFACE_BINDER
+BINDER=y
+L_CFLAGS += -DCONFIG_BINDER -DCONFIG_CTRL_IFACE_BINDER
+#LOCAL_AIDL_INCLUDES := frameworks/base/core/java
+LOCAL_AIDL_INCLUDES := \
+	    $(LOCAL_PATH) \
+			frameworks/native/include/binder
+OBJS += binder/binder.cpp
+OBJS += binder/android/external/wpa_supplicant/IWpaSupplicant.aidl
+OBJS += binder/android/external/wpa_supplicant/IWpaSupplicantInterface.aidl
+endif
+
 ifdef CONFIG_READLINE
 OBJS_c += src/utils/edit_readline.c
 LIBS_c += -lncurses -lreadline
@@ -1582,6 +1594,9 @@ endif
 LOCAL_CFLAGS := $(L_CFLAGS)
 LOCAL_SRC_FILES := $(OBJS)
 LOCAL_C_INCLUDES := $(INCLUDES)
+ifeq ($(BINDER), y)
+LOCAL_SHARED_LIBRARIES += libutils libbinder
+endif
 include $(BUILD_EXECUTABLE)
 
 ########################
